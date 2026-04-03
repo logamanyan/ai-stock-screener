@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Company Details</title>
+  <link rel="stylesheet" href="company.css?v=pro" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+<header class="header">
+  <button onclick="goBack()">← Back</button>
+  <h2 id="companyTitle">Loading...</h2>
+  <button id="addPortfolioBtn">➕ Add to Portfolio</button>
+
+</header>
+
+<div id="loading" class="loading">Loading company data...</div>
+<div id="error" class="error" style="display:none;">
+  Unable to load company information.
+</div>
+
+<div id="content" style="display:none;">
+
+  <section class="card">
+    <h3>Overview</h3>
+    <p><b>Symbol:</b> <span id="symbol"></span></p>
+    <p><b>Price:</b> $<span id="price"></span></p>
+    <p><b>Market Cap:</b> <span id="marketCap"></span></p>
+    <p><b>Sector:</b> <span id="sector"></span></p>
+  </section>
+
+  <section class="card">
+    <h3>Fundamentals</h3>
+    <table>
+      <tr><td>P/E Ratio</td><td id="pe"></td></tr>
+      <tr><td>Volume</td><td id="volume"></td></tr>
+    </table>
+  </section>
+
+  <section class="card">
+  <h3>Stock Price Trend</h3>
+  <canvas id="priceChart" height="100"></canvas>
+</section>
+
+<section class="card">
+  <h3>Revenue Trend</h3>
+  <canvas id="revenueChart" height="100"></canvas>
+</section>
+
+  <section class="card">
+    <h3>Actions</h3>
+    <button id="watchlistBtn">⭐ Add to Watchlist</button>
+  </section>
+
+</div>
+
+<script src="company.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>

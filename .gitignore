@@ -1,0 +1,18 @@
+# Python virtual environment
+venv/
+env/
+.env
+__pycache__/
+*.pyc
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# Docker
+.dockerignore
+
+# OS generated files
+.DS_Store
+Thumbs.db

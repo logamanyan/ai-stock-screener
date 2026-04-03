@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwd
+      POSTGRES_DB: stock_screener
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stock_screener"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:pwd@db:5432/stock_screener
+      # Provide your API key through an environment variable or .env file locally 
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-YOUR_API_KEY_HERE}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
