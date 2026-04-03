@@ -29,7 +29,8 @@ app.add_middleware(
 
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    raise ValueError("Critical: No GEMINI_API_KEY found in environment variables. Do not hardcode credentials.")
+    # If not found in environment, we can check for a .env file or tell the user how to set it
+    raise ValueError("Critical: No GEMINI_API_KEY found in environment variables. Please set it using '$env:GEMINI_API_KEY = \"your_key\"' in PowerShell.")
 llm = LLMEngine(api_key=api_key)
 
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
@@ -111,6 +112,28 @@ def get_live_price(symbol: str):
         }
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/api/v1/history/{symbol}")
+def get_stock_history(symbol: str):
+    try:
+        ticker = yf.Ticker(symbol)
+        # Fetch 1 month of daily closing prices
+        hist = ticker.history(period="1mo")
+        if hist.empty:
+            return {"status": "error", "message": "No history found"}
+        
+        # Clean data: drop NaN and only take prices > 0
+        hist = hist.dropna(subset=['Close'])
+        hist = hist[hist['Close'] > 0]
+        
+        return {
+            "status": "success",
+            "symbol": symbol,
+            "dates": hist.index.strftime('%b %d').tolist(),
+            "prices": hist['Close'].tolist()
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api/v1/advisor/{symbol}")
 def get_ai_advisor_report(symbol: str):

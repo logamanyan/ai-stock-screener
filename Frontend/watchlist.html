@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio | ScreenerAI Pro</title>
+    <title>My Watchlist | ScreenerAI Pro</title>
     <link rel="stylesheet" href="style.css?v=pro">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -16,29 +16,29 @@
         </div>
         <div class="nav-group">
             <button class="nav-btn" onclick="window.location.href='index.html'">🏠 <span>Home</span></button>
-            <button class="nav-btn" onclick="window.location.href='watchlist.html'">⭐ <span>Watchlist</span></button>
-            <button class="nav-btn active">💼 <span>Portfolio</span></button>
+            <button class="nav-btn active">⭐ <span>Watchlist</span></button>
+            <button class="nav-btn" onclick="window.location.href='portfolio.html'">💼 <span>Portfolio</span></button>
         </div>
     </header>
 
     <main class="main-content">
         <section class="results-section">
             <div class="section-header">
-                <h2 class="section-title">Investment Portfolio</h2>
-                <div id="portfolioSummary" class="status-pill" style="background: var(--bg-elevated); border: 1px solid var(--border);">
-                    Loading summary...
+                <h2 class="section-title">Pinned Stocks</h2>
+                <div id="watchlistSummary" class="status-pill" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+                    Loading watchlist...
                 </div>
             </div>
 
-            <div id="portfolioList" class="results-grid">
-                <!-- Portfolio items will be injected here -->
-                <div class="loader-container">
+            <div id="watchlistList" class="results-grid">
+                <!-- Watchlist items will be injected here -->
+                <div class="loader-container" id="watchlistLoader">
                     <div class="loader"></div>
                 </div>
             </div>
         </section>
     </main>
 
-    <script src="portfolio.js"></script>
+    <script src="watchlist.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080/api/v1';
+const API_BASE = '/api/v1';
 
 const params = new URLSearchParams(window.location.search);
 const symbol = params.get('symbol');
@@ -13,25 +13,31 @@ function goBack() {
 
 async function loadCompany() {
   try {
-
     const res = await fetch(`${API_BASE}/screener/execute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raw_query: 'price > 0' })
+      body: JSON.stringify({ raw_query: `symbol = '${symbol}'` })
     });
 
     const data = await res.json();
-    const stock = data.stocks.find(s => s.symbol === symbol);
+    const stock = data.stocks[0];
 
-    if (!stock) throw new Error('No data');
+    if (!stock) throw new Error('No data found for ' + symbol);
 
-    document.getElementById('companyTitle').innerText = stock.name;
+    document.getElementById('companyTitle').innerText = stock.company_name;
     document.getElementById('symbol').innerText = stock.symbol;
-    document.getElementById('price').innerText = stock.price;
-    document.getElementById('marketCap').innerText = stock.market_cap;
+    document.getElementById('price').innerText = parseFloat(stock.price).toFixed(2);
+    
+    let mktCap = parseFloat(stock.market_cap);
+    if (mktCap > 1e12) {
+        document.getElementById('marketCap').innerText = `$${(mktCap / 1e12).toFixed(2)}T`;
+    } else {
+        document.getElementById('marketCap').innerText = `$${(mktCap / 1e9).toFixed(2)}B`;
+    }
+    
     document.getElementById('sector').innerText = stock.sector || 'N/A';
-    document.getElementById('pe').innerText = stock.pe_ratio;
-    document.getElementById('volume').innerText = stock.volume;
+    document.getElementById('pe').innerText = parseFloat(stock.pe_ratio).toFixed(2);
+    document.getElementById('volume').innerText = stock.volume.toLocaleString();
 
     document.getElementById('watchlistBtn').onclick = async () => {
       await fetch(`${API_BASE}/watchlist`, {
@@ -39,79 +45,38 @@ async function loadCompany() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symbol })
       });
-      alert(`${symbol} added to watchlist`);
+      alert(`${symbol} added to watchlist!`);
+    };
+
+    document.getElementById('addPortfolioBtn').onclick = async () => {
+      const qty = prompt("How many shares did you buy?", "10");
+      if (!qty) return;
+
+      const resPort = await fetch(`${API_BASE}/portfolio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol,
+          quantity: parseFloat(qty),
+          average_price: parseFloat(stock.price)
+        })
+      });
+
+      if (resPort.ok) {
+        alert(`${qty} shares of ${symbol} added to portfolio!`);
+      } else {
+        alert("Failed to add to portfolio.");
+      }
     };
 
     loading.style.display = 'none';
     content.style.display = 'block';
 
   } catch (e) {
+    console.error(e);
     loading.style.display = 'none';
     error.style.display = 'block';
   }
 }
 
-function renderPriceChart() {
-  const ctx = document.getElementById('priceChart').getContext('2d');
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Price ($)',
-        data: [150, 155, 148, 160, 170, 175],
-        borderColor: '#00e5ff',
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
-      }
-    }
-  });
-}
-
-function renderRevenueChart() {
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['2019', '2020', '2021', '2022', '2023'],
-      datasets: [{
-        label: 'Revenue ($B)',
-        data: [200, 220, 240, 260, 280],
-        backgroundColor: '#4caf50'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
-      }
-    }
-  });
-
-  document.getElementById('addPortfolioBtn').onclick = async () => {
-  await fetch('http://localhost:8080/api/v1/portfolio', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      symbol,
-      quantity: 10,
-      buyPrice: document.getElementById('price').innerText
-    })
-  });
-
-  alert('Added to portfolio');
-};
-
-}
 loadCompany();
-renderPriceChart();
-renderRevenueChart();
-content.style.display = 'block';
-

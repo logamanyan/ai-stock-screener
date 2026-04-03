@@ -6,7 +6,8 @@ class LLMEngine:
     def __init__(self, api_key: str = None):
         if api_key:
             genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        # Use 'gemini-1.5-flash' for high-speed financial queries and better reliability
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
 
     def generate_sql(self, nl_query: str) -> str:
         """
